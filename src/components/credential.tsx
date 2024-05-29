@@ -1,6 +1,14 @@
-import { Image, ImageBackground, Text, View } from "react-native";
+import { Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 
-export function Credential() {
+import { Feather } from "@expo/vector-icons";
+import { colors } from "@/styles/colors";
+
+type Props = {
+  image?: string
+  onChangeAvatar?: () => void
+}
+
+export function Credential({ onChangeAvatar, image }: Props) {
   return (
     <View className="w-full self-stretch items-center">
       <Image 
@@ -21,7 +29,39 @@ export function Credential() {
           <View className="w-40 h-40 bg-black rounded-full" />
         </ImageBackground>
 
-        <Image source={{ uri: "https://github.com/jvdsantos3.png" }} className="w-36 h-36 rounded-full" />
+        {image ? (
+          <Image 
+            source={{ uri: image }} 
+            className="w-36 h-36 rounded-full -mt-24" 
+          />
+        ) : (
+          <TouchableOpacity 
+            activeOpacity={0.7} 
+            className="w-36 h-36 rounded-full -mt-24 bg-gray-400 items-center justify-center"
+            onPress={onChangeAvatar}
+          >
+            <Feather name="camera" color={colors.green[400]} size={32} />
+          </TouchableOpacity>
+        )}
+
+        <Text className="font-bold text-2xl text-zinc-50 mt-4">
+          João Vitor
+        </Text>
+
+        <Text className="font-regular text-base text-zinc-300 mb-4">
+          rodrigo@email.com
+        </Text>
+
+        <Image 
+          source={require("@/assets/ticket/qrcode.png")} 
+          className="w-32 h-32"
+        />
+
+        <TouchableOpacity activeOpacity={0.7} className="mt-6">
+          <Text className="font-body text-orange-500 text-sm">
+            Ampliar QRCode
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   )

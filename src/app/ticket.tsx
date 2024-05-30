@@ -3,16 +3,20 @@ import { StatusBar, Text, View, ScrollView, TouchableOpacity, Alert, Modal } fro
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImagerPicker from "expo-image-picker"
 
+import { useBadgeStore } from "@/store/badge-store"
+
 import { colors } from "@/styles/colors";
 
 import { Credential } from "@/components/credential";
 import { Header } from "@/components/header";
 import { Button } from "@/components/button";
 import { QRCode } from "@/components/qrcode";
+import { Redirect } from "expo-router";
 
 export default function Ticket() {
-  const [image, setImage] = useState("")
   const [expandQRCode, setExpandQRCode] = useState(false)
+
+  const badgeStore = useBadgeStore()
 
   async function handleSelectImage() {
     try {
@@ -23,12 +27,16 @@ export default function Ticket() {
       })
 
       if (result.assets) {
-        setImage(result.assets[0].uri)
+        badgeStore.updateAvatar(result.assets[0].uri)
       }
     } catch (error) {
       console.log(error)
       Alert.alert("Foto", "Não foi possivel selecionar a imagem.")
     }
+  }
+
+  if (!badgeStore.data?.checkInURL) {
+    return <Redirect href="/" />
   }
 
   return (
@@ -42,7 +50,7 @@ export default function Ticket() {
         showsHorizontalScrollIndicator={false}
       >
         <Credential 
-          image={image} 
+          data={badgeStore.data}
           onChangeAvatar={handleSelectImage} 
           onExpandQRCode={() => setExpandQRCode(true)}
         />
@@ -59,12 +67,16 @@ export default function Ticket() {
         </Text>
 
         <Text className="text-white font-regular text-base mt-1 mb-6">
-          Mostre ao mundo que você vai participar do Unite Summit!
+          Mostre ao mundo que você vai participar do evento { badgeStore.data.eventTitle }!
         </Text>
 
         <Button title="Compartilhar" />
 
-        <TouchableOpacity activeOpacity={0.7} className="mt-10">
+        <TouchableOpacity 
+          activeOpacity={0.7} 
+          className="mt-10"
+          onPress={() => badgeStore.remove()}
+        >
           <Text className="text-base text-white font-bold text-center">Remover Ingresso</Text>
         </TouchableOpacity>
       </ScrollView>

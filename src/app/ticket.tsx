@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { StatusBar, Text, View, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { StatusBar, Text, View, ScrollView, TouchableOpacity, Alert, Modal } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import * as ImagerPicker from "expo-image-picker"
 
@@ -8,9 +8,11 @@ import { colors } from "@/styles/colors";
 import { Credential } from "@/components/credential";
 import { Header } from "@/components/header";
 import { Button } from "@/components/button";
+import { QRCode } from "@/components/qrcode";
 
 export default function Ticket() {
   const [image, setImage] = useState("")
+  const [expandQRCode, setExpandQRCode] = useState(false)
 
   async function handleSelectImage() {
     try {
@@ -21,7 +23,7 @@ export default function Ticket() {
       })
 
       if (result.assets) {
-        console.log(result.assets)
+        setImage(result.assets[0].uri)
       }
     } catch (error) {
       console.log(error)
@@ -33,12 +35,17 @@ export default function Ticket() {
     <View className="flex-1 bg-green-500">
       <StatusBar barStyle="light-content" />
       <Header title="Minha Credencial" />
+
       <ScrollView 
         className="-mt-28 -z-10" 
         contentContainerClassName="px-8 pb-8" 
         showsHorizontalScrollIndicator={false}
       >
-        <Credential image={image} onChangeAvatar={handleSelectImage} />
+        <Credential 
+          image={image} 
+          onChangeAvatar={handleSelectImage} 
+          onExpandQRCode={() => setExpandQRCode(true)}
+        />
 
         <FontAwesome 
           name="angle-double-down"
@@ -61,6 +68,21 @@ export default function Ticket() {
           <Text className="text-base text-white font-bold text-center">Remover Ingresso</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal visible={expandQRCode} statusBarTranslucent>
+        <View className="flex-1 bg-green-500 items-center justify-center">
+          <TouchableOpacity 
+            activeOpacity={0.7} 
+            onPress={() => setExpandQRCode(false)}
+          >
+            <QRCode value="teste" size={300} />
+
+            <Text className="font-body text-orange-500 text-sm mt-10 text-center">
+              Fechar
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   )
 }
